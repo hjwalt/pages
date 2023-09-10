@@ -15,13 +15,13 @@ const (
 	path      = "/"
 )
 
-var html = example.Page(directory + "/page.html")
+var Html = example.Page(directory + "/page.html")
 
 type model struct {
 }
 
 func page(c example.Context, w http.ResponseWriter, r *http.Request) (*template.Template, model, error) {
-	return html, model{}, nil
+	return Html, model{}, nil
 }
 
 func Get() runtime.Configuration[*runtime_chi.Runtime[example.Context]] {
