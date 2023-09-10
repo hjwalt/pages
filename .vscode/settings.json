@@ -1,0 +1,6 @@
+{
+  "html.format.wrapAttributes": "force-aligned",
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+}
