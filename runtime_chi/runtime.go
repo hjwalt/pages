@@ -39,6 +39,13 @@ func WithPort[C context.Context](port int) runtime.Configuration[*Runtime[C]] {
 	}
 }
 
+func WithTls[C context.Context](certPath string, keyPath string) runtime.Configuration[*Runtime[C]] {
+	return func(r *Runtime[C]) *Runtime[C] {
+		r.httpConfiguration = append(r.httpConfiguration, runtime.HttpWithTls(certPath, keyPath))
+		return r
+	}
+}
+
 func WithHttpConfiguration[C context.Context](config runtime.Configuration[*runtime.HttpRunnable]) runtime.Configuration[*Runtime[C]] {
 	return func(r *Runtime[C]) *Runtime[C] {
 		r.httpConfiguration = append(r.httpConfiguration, config)
