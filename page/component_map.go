@@ -26,23 +26,30 @@ type ComponentMap[C context.Context, M any] struct {
 }
 
 func (c ComponentMap[C, M]) Render(ctx C, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
-	return ComponentRenderMap[C, M](ctx, w, r, c.Template, c.Model, c.Components)
+	model, err := ComponentMapCreateModel(ctx, w, r, c.Model, c.Components)
+	if err != nil {
+		return template.HTML(""), err
+	}
+	return ComponentRender[C, ComponentMapModel[M]](ctx, w, r, c.Template, model)
 }
 
-func ComponentRenderMap[C context.Context, M any](ctx C, w http.ResponseWriter, r *http.Request, t *template.Template, m M, cs map[string]Component[C]) (template.HTML, error) {
+func (c ComponentMap[C, M]) Page(ctx C, w http.ResponseWriter, r *http.Request) (*template.Template, ComponentMapModel[M], error) {
+	model, err := ComponentMapCreateModel(ctx, w, r, c.Model, c.Components)
+	return c.Template, model, err
+}
+
+func ComponentMapCreateModel[C context.Context, M any](ctx C, w http.ResponseWriter, r *http.Request, m M, cs map[string]Component[C]) (ComponentMapModel[M], error) {
 	components := map[string]template.HTML{}
 	for i, com := range cs {
 		var renderErr error
 		components[i], renderErr = com.Render(ctx, w, r)
 		if renderErr != nil {
-			return template.HTML(""), renderErr
+			return ComponentMapModel[M]{}, renderErr
 		}
 	}
 
-	model := ComponentMapModel[M]{
+	return ComponentMapModel[M]{
 		Model:      m,
 		Components: components,
-	}
-
-	return ComponentRender[C, ComponentMapModel[M]](ctx, w, r, t, model)
+	}, nil
 }

@@ -26,23 +26,30 @@ type ComponentSlice[C context.Context, M any] struct {
 }
 
 func (c ComponentSlice[C, M]) Render(ctx C, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
-	return ComponentRenderSlice[C, M](ctx, w, r, c.Template, c.Model, c.Components)
+	model, err := ComponentSliceCreateModel(ctx, w, r, c.Model, c.Components)
+	if err != nil {
+		return template.HTML(""), err
+	}
+	return ComponentRender[C, ComponentSliceModel[M]](ctx, w, r, c.Template, model)
 }
 
-func ComponentRenderSlice[C context.Context, M any](ctx C, w http.ResponseWriter, r *http.Request, t *template.Template, m M, cs []Component[C]) (template.HTML, error) {
+func (c ComponentSlice[C, M]) Page(ctx C, w http.ResponseWriter, r *http.Request) (*template.Template, ComponentSliceModel[M], error) {
+	model, err := ComponentSliceCreateModel(ctx, w, r, c.Model, c.Components)
+	return c.Template, model, err
+}
+
+func ComponentSliceCreateModel[C context.Context, M any](ctx C, w http.ResponseWriter, r *http.Request, m M, cs []Component[C]) (ComponentSliceModel[M], error) {
 	components := make([]template.HTML, len(cs))
 	for i, com := range cs {
 		var renderErr error
 		components[i], renderErr = com.Render(ctx, w, r)
 		if renderErr != nil {
-			return template.HTML(""), renderErr
+			return ComponentSliceModel[M]{}, renderErr
 		}
 	}
 
-	model := ComponentSliceModel[M]{
+	return ComponentSliceModel[M]{
 		Model:      m,
 		Components: components,
-	}
-
-	return ComponentRender[C, ComponentSliceModel[M]](ctx, w, r, t, model)
+	}, nil
 }

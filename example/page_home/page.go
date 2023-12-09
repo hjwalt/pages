@@ -12,6 +12,7 @@ import (
 	"github.com/hjwalt/routes/example/component_sidebar_item_header"
 	"github.com/hjwalt/routes/example/component_sidebar_item_list"
 	"github.com/hjwalt/routes/example/page_error_500"
+	"github.com/hjwalt/routes/page"
 	"github.com/hjwalt/routes/runtime_chi"
 	"github.com/hjwalt/runway/runtime"
 )
@@ -27,7 +28,7 @@ type model struct {
 	Sidebar template.HTML
 }
 
-func page(c example.Context, w http.ResponseWriter, r *http.Request) (*template.Template, model, error) {
+func sidebar() page.Component[example.Context] {
 	sidebarTop := component_sidebar_item_list.New(
 		component_sidebar_item_list.Model{},
 		component_sidebar_item.Model{Icon: "dashboard", Label: "Dashboard", Link: "/", Active: true},
@@ -46,16 +47,26 @@ func page(c example.Context, w http.ResponseWriter, r *http.Request) (*template.
 		component_sidebar_button.Model{Label: "Documentation", Link: "https://www.creative-tim.com/learning-lab/bootstrap/overview/material-dashboard?ref=sidebarfree", Outlined: true},
 		component_sidebar_button.Model{Label: "Upgrade to pro", Link: "https://www.creative-tim.com/product/material-dashboard-pro?ref=sidebarfree", Outlined: false},
 	)
-	sidebar := component_sidebar.New(
+	return component_sidebar.New(
 		component_sidebar.Model{},
 		sidebarTop,
 		sidebarButton,
 	)
+}
 
-	rendered, _ := sidebar.Render(c, w, r)
-	return Html, model{Sidebar: rendered}, nil
+func pageHandler(c example.Context, w http.ResponseWriter, r *http.Request) (*template.Template, page.ComponentMapModel[model], error) {
+	model, err := page.ComponentMapCreateModel(
+		c,
+		w,
+		r,
+		model{},
+		map[string]page.Component[example.Context]{
+			"sidebar": sidebar(),
+		},
+	)
+	return Html, model, err
 }
 
 func Get() runtime.Configuration[*runtime_chi.Runtime[example.Context]] {
-	return runtime_chi.WithPage(path, http.MethodGet, page, page_error_500.Error)
+	return runtime_chi.WithPage(path, http.MethodGet, pageHandler, page_error_500.Error)
 }
