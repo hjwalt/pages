@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/hjwalt/routes/mvc"
 	"github.com/hjwalt/routes/page"
 	"github.com/hjwalt/routes/route"
 	"github.com/hjwalt/runway/runtime"
@@ -70,6 +71,13 @@ func WithMiddleware[C context.Context](middleware ...route.Middleware) runtime.C
 func WithPage[C context.Context, M any](path string, method string, pageHandler page.Handler[C, M], errorHandler page.Error[C]) runtime.Configuration[*Runtime[C]] {
 	return func(r *Runtime[C]) *Runtime[C] {
 		page.Add(r.configuration, path, method, pageHandler, errorHandler)
+		return r
+	}
+}
+
+func WithController[C context.Context](path string, method string, controller mvc.Controller[C], errorHandler mvc.Error[C]) runtime.Configuration[*Runtime[C]] {
+	return func(r *Runtime[C]) *Runtime[C] {
+		mvc.RouteController(r.configuration, path, method, controller, errorHandler)
 		return r
 	}
 }

@@ -2,12 +2,14 @@ package page
 
 import (
 	"context"
+	"html/template"
 	"net/http"
 
 	"github.com/hjwalt/routes/route"
-	"github.com/hjwalt/runway/logger"
 	"github.com/hjwalt/runway/reflect"
 )
+
+type Handler[C context.Context, M any] func(c C, w http.ResponseWriter, r *http.Request) (*template.Template, M, error)
 
 type Page[C context.Context, M any] struct {
 	Decorators   []route.Decorator[C]
@@ -37,13 +39,5 @@ func (p *Page[C, M]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if executeErr != nil {
 		handleError(ctx, w, r, executeErr, p.ErrorHandler)
 		return
-	}
-}
-
-func handleError[C context.Context](ctx C, w http.ResponseWriter, r *http.Request, err error, errHandler Error[C]) {
-	errTemplate := errHandler(ctx, w, r, err)
-	errTemplateErr := errTemplate.Execute(w, err)
-	if errTemplateErr != nil {
-		logger.ErrorErr("error handling error", errTemplateErr)
 	}
 }

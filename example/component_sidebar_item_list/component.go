@@ -3,9 +3,10 @@ package component_sidebar_item_list
 import (
 	"embed"
 	"html/template"
+	"net/http"
 
 	"github.com/hjwalt/routes/example"
-	"github.com/hjwalt/routes/page"
+	"github.com/hjwalt/routes/mvc"
 )
 
 //go:embed *
@@ -16,6 +17,11 @@ var Html = template.Must(template.ParseFS(files, "component.html"))
 type Model struct {
 }
 
-func New(m Model, items ...page.Component[example.Context]) page.Component[example.Context] {
-	return page.NewComponentSlice[example.Context, Model](Html, m, items)
+type Component struct {
+	Model      Model
+	Components []mvc.Component[example.Context]
+}
+
+func (c Component) Render(ctx example.Context, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
+	return mvc.ComponentSliceRender[example.Context, Model](ctx, w, r, Html, c.Model, c.Components)
 }

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/hjwalt/routes/example"
+	"github.com/hjwalt/routes/mvc"
 )
 
 const (
@@ -15,4 +16,8 @@ var Html = example.Page(directory + "/page.html")
 
 func Error(c example.Context, w http.ResponseWriter, r *http.Request, err error) *template.Template {
 	return Html
+}
+
+func Controller(c example.Context, w http.ResponseWriter, r *http.Request, err error) mvc.View[example.Context] {
+	return mvc.ComponentBasic[example.Context, error]{Template: Html, Model: err}
 }

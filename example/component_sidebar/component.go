@@ -3,9 +3,10 @@ package component_sidebar
 import (
 	"embed"
 	"html/template"
+	"net/http"
 
 	"github.com/hjwalt/routes/example"
-	"github.com/hjwalt/routes/page"
+	"github.com/hjwalt/routes/mvc"
 )
 
 //go:embed *
@@ -19,11 +20,17 @@ type Model struct {
 	Active bool
 }
 
-func New(m Model, top page.Component[example.Context], button page.Component[example.Context]) page.Component[example.Context] {
-	items := map[string]page.Component[example.Context]{}
+type Component struct {
+	Model  Model
+	Top    mvc.Component[example.Context]
+	Button mvc.Component[example.Context]
+}
 
-	items["top"] = top
-	items["button"] = button
+func (c Component) Render(ctx example.Context, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
+	items := map[string]mvc.Component[example.Context]{}
 
-	return page.NewComponentMap[example.Context, Model](Html, m, items)
+	items["top"] = c.Top
+	items["button"] = c.Button
+
+	return mvc.ComponentMapRender(ctx, w, r, Html, c.Model, items)
 }

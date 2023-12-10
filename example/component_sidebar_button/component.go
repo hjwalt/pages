@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/hjwalt/routes/example"
-	"github.com/hjwalt/routes/page"
+	"github.com/hjwalt/routes/mvc"
 )
 
 //go:embed *
@@ -21,5 +21,5 @@ type Model struct {
 }
 
 func (c Model) Render(ctx example.Context, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
-	return page.ComponentRender[example.Context, Model](ctx, w, r, Html, c)
+	return mvc.ComponentRender[example.Context, Model](ctx, w, r, Html, c)
 }
