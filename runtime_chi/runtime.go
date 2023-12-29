@@ -82,6 +82,13 @@ func WithController[C context.Context](path string, method string, controller mv
 	}
 }
 
+func WithHttpHandler[C context.Context](path string, method string, handler http.Handler) runtime.Configuration[*Runtime[C]] {
+	return func(r *Runtime[C]) *Runtime[C] {
+		r.configuration.AddRoute(path, method, handler)
+		return r
+	}
+}
+
 func WithStatic[C context.Context](prefix string, dir string) runtime.Configuration[*Runtime[C]] {
 	return func(r *Runtime[C]) *Runtime[C] {
 		r.configuration.AddRoute(prefix+"*", http.MethodGet, http.StripPrefix(prefix, http.FileServer(http.Dir(dir))))
