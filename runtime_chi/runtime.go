@@ -77,7 +77,14 @@ func WithPage[C context.Context, M any](path string, method string, pageHandler 
 
 func WithController[C context.Context](path string, method string, controller mvc.Controller[C], errorHandler mvc.Error[C]) runtime.Configuration[*Runtime[C]] {
 	return func(r *Runtime[C]) *Runtime[C] {
-		mvc.RouteController(r.configuration, path, method, controller, errorHandler)
+		mvc.Add(r.configuration, path, method, controller, errorHandler)
+		return r
+	}
+}
+
+func WithCustom[C context.Context](path string, method string, handler route.Handler[C], errorHandler route.Error) runtime.Configuration[*Runtime[C]] {
+	return func(r *Runtime[C]) *Runtime[C] {
+		route.Add(r.configuration, path, method, handler, errorHandler)
 		return r
 	}
 }

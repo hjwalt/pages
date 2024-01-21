@@ -9,7 +9,7 @@ import (
 	"github.com/hjwalt/runway/reflect"
 )
 
-func RouteController[C context.Context](c *route.Configuration[C], r string, m string, p Controller[C], e Error[C]) {
+func Add[C context.Context](c *route.Configuration[C], r string, m string, p Controller[C], e Error[C]) {
 	routeHandler := &controller[C]{
 		Decorators:   c.Decorators,
 		Controller:   p,
