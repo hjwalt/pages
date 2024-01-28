@@ -54,3 +54,7 @@ type ComponentSlice[C context.Context, M any] struct {
 func (c ComponentSlice[C, M]) Render(ctx C, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
 	return ComponentSliceRender[C, M](ctx, w, r, c.Template, c.Model, c.Components)
 }
+
+func (c ComponentSlice[C, M]) Write(ctx C, w http.ResponseWriter, r *http.Request) error {
+	return ComponentSliceWrite[C, M](ctx, w, r, c.Template, c.Model, c.Components)
+}
