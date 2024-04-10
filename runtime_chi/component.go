@@ -14,8 +14,8 @@ const (
 	QualifierChiRoute      = "chi_route_builder"
 )
 
-func NewComponent[C context.Context]() managed.Component {
-	return &chiComponent[C]{}
+func AddHttpHandler[C context.Context](ic inverse.Container) {
+	managed.AddComponent(ic, &chiComponent[C]{})
 }
 
 // implementation
@@ -27,7 +27,7 @@ func (c *chiComponent[C]) Name() string {
 }
 
 func (r *chiComponent[C]) Register(rctx context.Context, ic inverse.Container) error {
-	inverse.GenericAdd(ic, managed.QualifierHttpHandler, func(ctx context.Context, c inverse.Container) (http.Handler, error) {
+	managed.AddHttpHandler(ic, func(ctx context.Context, c inverse.Container) (http.Handler, error) {
 		middlewares, middlewareErr := inverse.GenericGetAll[route.Middleware](ic, ctx, QualifierChiMiddleware)
 		if middlewareErr != nil {
 			return nil, middlewareErr

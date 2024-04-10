@@ -46,7 +46,7 @@ func AddCustom[C context.Context](path string, method string, handler route.Hand
 	}
 }
 
-func AddHttpHandler[C context.Context](path string, method string, handler http.Handler) route.Adder[C] {
+func AddHttpHandlerRoute[C context.Context](path string, method string, handler http.Handler) route.Adder[C] {
 	return func(config *route.Configuration[C]) {
 		config.AddRoute(path, method, handler)
 	}

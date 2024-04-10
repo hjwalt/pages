@@ -4,8 +4,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/go-chi/chi/v5 v5.0.11 h1:BnpYbFZ3T3S1WMpD79r7R5ThWX40TaFB7L31Y8xqSwA=
 github.com/go-chi/chi/v5 v5.0.11/go.mod h1:DslCQbL2OYiznFReuXYUmQ2hGd1aDpCnlMNITLSKoi8=
 github.com/google/go-cmp v0.5.5 h1:Khx7svrCpmxxtHBq5j2mp/xVjsi8hQMfNLvJFAlrGgU=
-github.com/hjwalt/runway v0.2.13 h1:a1X3GuoiAGl+AA6qcLUZUcYuFaF5CGc2Aqvln/OINVw=
-github.com/hjwalt/runway v0.2.13/go.mod h1:RYVdOcNLOUkGulDOvxCLERE3HQ4SARuy1IFDX78YGc8=
+github.com/hjwalt/runway v0.2.15 h1:DCwZrE85t+Is8Y1rzYjz3i1oR292KRYCmch02WeTb1s=
+github.com/hjwalt/runway v0.2.15/go.mod h1:RYVdOcNLOUkGulDOvxCLERE3HQ4SARuy1IFDX78YGc8=
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
 github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

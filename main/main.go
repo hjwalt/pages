@@ -24,15 +24,13 @@ func main() {
 	ctx := context.Background()
 	ic := inverse.NewContainer()
 
-	managed.AddConfiguration(ic, "http", map[string]string{
+	managed.AddHealth(ic)
+	managed.AddHttp(ic)
+	managed.AddHttpConfig(ic, map[string]string{
 		managed.ConfHttpPort: "3001",
 	})
 
-	managed.AddComponent(ic, runtime_chi.NewComponent[example.Context]())
-	managed.AddComponent(ic, managed.NewHealth())
-
-	managed.AddService(ic, managed.NewHttp())
-
+	runtime_chi.AddHttpHandler[example.Context](ic)
 	runtime_chi.AddMiddleware[example.Context](
 		ic,
 		middleware.RequestID,
