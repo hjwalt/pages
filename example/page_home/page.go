@@ -13,6 +13,7 @@ import (
 	"github.com/hjwalt/routes/example/page_error_500"
 	"github.com/hjwalt/routes/mvc"
 	"github.com/hjwalt/routes/runtime_chi"
+	"github.com/hjwalt/runway/inverse"
 	"github.com/hjwalt/runway/runtime"
 )
 
@@ -69,4 +70,11 @@ func controller(c example.Context, w http.ResponseWriter, r *http.Request) (mvc.
 
 func Get() runtime.Configuration[*runtime_chi.Runtime[example.Context]] {
 	return runtime_chi.WithController(path, http.MethodGet, controller, page_error_500.Controller)
+}
+
+func Add(ic inverse.Container) {
+	runtime_chi.AddRoute[example.Context](
+		ic,
+		runtime_chi.AddController(path, http.MethodGet, controller, page_error_500.Controller),
+	)
 }

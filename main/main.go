@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"log/slog"
 	"time"
 
 	"github.com/go-chi/chi/v5/middleware"
@@ -8,39 +10,62 @@ import (
 	"github.com/hjwalt/routes/example/page_billing"
 	"github.com/hjwalt/routes/example/page_home"
 	"github.com/hjwalt/routes/runtime_chi"
+	"github.com/hjwalt/runway/inverse"
 	"github.com/hjwalt/runway/logger"
+	"github.com/hjwalt/runway/managed"
 	"github.com/hjwalt/runway/runtime"
 	"github.com/joho/godotenv"
 )
 
 func main() {
+	logger.Default()
 	godotenv.Load()
 
-	httpRuntime := runtime_chi.New[example.Context](
-		runtime_chi.WithMiddleware[example.Context](middleware.RequestID),
-		runtime_chi.WithMiddleware[example.Context](middleware.RealIP),
-		runtime_chi.WithMiddleware[example.Context](middleware.CleanPath),
-		runtime_chi.WithMiddleware[example.Context](middleware.Recoverer),
-		runtime_chi.WithPort[example.Context](3001),
-		runtime_chi.WithStatic[example.Context]("/static/", "./example/static"),
-		page_home.Get(),
-		page_billing.Get(),
-	)
+	ctx := context.Background()
+	ic := inverse.NewContainer()
 
-	err := runtime.Start(
-		[]runtime.Runtime{
-			httpRuntime,
-		},
-		time.Second,
-	)
+	managed.AddConfiguration(ic, "http", map[string]string{
+		managed.ConfHttpPort: "3001",
+	})
 
+	managed.AddComponent(ic, runtime_chi.NewComponent[example.Context]())
+	managed.AddComponent(ic, managed.NewHealth())
+
+	managed.AddService(ic, managed.NewHttp())
+
+	runtime_chi.AddMiddleware[example.Context](
+		ic,
+		middleware.RequestID,
+		middleware.RealIP,
+		middleware.CleanPath,
+		middleware.Recoverer,
+	)
+	runtime_chi.AddRoute[example.Context](
+		ic,
+		runtime_chi.AddStatic[example.Context]("/static/", "./example/static"),
+	)
+	page_home.Add(ic)
+	page_billing.Add(ic)
+
+	managed, err := managed.New(ic, ctx)
 	if err != nil {
 		panic(err)
 	}
 
-	logger.Info("started")
+	startErr := runtime.Start(
+		[]runtime.Runtime{
+			managed,
+		},
+		time.Second,
+	)
+
+	if startErr != nil {
+		panic(startErr)
+	}
+
+	slog.Info("started")
 
 	runtime.Wait()
 
-	logger.Info("stopped")
+	slog.Info("stopped")
 }

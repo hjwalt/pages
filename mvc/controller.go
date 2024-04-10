@@ -2,10 +2,10 @@ package mvc
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 
 	"github.com/hjwalt/routes/route"
-	"github.com/hjwalt/runway/logger"
 	"github.com/hjwalt/runway/reflect"
 )
 
@@ -33,7 +33,7 @@ func (p *controller[C]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	for _, decorator := range p.Decorators {
 		ctx, ctxErr = decorator(ctx, w, r)
 		if ctxErr != nil {
-			logger.ErrorErr("error decorating", ctxErr)
+			slog.Error("error decorating", "error", ctxErr)
 			handleError(ctx, w, r, ctxErr, p.ErrorHandler)
 			return
 		}
@@ -41,14 +41,14 @@ func (p *controller[C]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	view, viewErr := p.Controller(ctx, w, r)
 	if viewErr != nil {
-		logger.ErrorErr("error getting view", viewErr)
+		slog.Error("error getting view", "error", viewErr)
 		handleError(ctx, w, r, viewErr, p.ErrorHandler)
 		return
 	}
 
 	executeErr := view.Write(ctx, w, r)
 	if executeErr != nil {
-		logger.ErrorErr("error executing view", executeErr)
+		slog.Error("error executing view", "error", executeErr)
 		handleError(ctx, w, r, executeErr, p.ErrorHandler)
 		return
 	}
